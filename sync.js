@@ -1,4 +1,6 @@
-const { Client } = require('@notionhq/client');
+const notionPkg = require('./node_modules/@notionhq/client');
+console.log('Notion package keys:', Object.keys(notionPkg));
+const Client = notionPkg.Client;
 const fs = require('fs');
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
