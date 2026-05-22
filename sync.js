@@ -1,27 +1,21 @@
-const notionPkg = require('./node_modules/@notionhq/client');
-const Client = notionPkg.Client;
+const pkg = require('./node_modules/@notionhq/client');
+const Client = pkg.Client;
 const fs = require('fs');
 
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
-console.log('Client type:', typeof notion);
-console.log('Client keys:', Object.keys(notion));
-console.log('databases:', typeof notion.databases);
-console.log('databases.query:', typeof notion.databases?.query);
+const client = new Client({ auth: process.env.NOTION_TOKEN });
 
-const notion = new Client({ auth: process.env.NOTION_TOKEN });
+console.log('Connecting to Notion...');
 
 async function fetchPosts() {
-  console.log('Connecting to Notion...');
-  
-  const db = await notion.databases.query({
+  const db = await client.databases.query({
     database_id: process.env.NOTION_DATABASE_ID,
     sorts: [{ timestamp: 'created_time', direction: 'descending' }]
   });
 
-  console.log('Found ' + db.results.length + ' rows in database');
+  console.log('Found ' + db.results.length + ' rows');
 
   const posts = await Promise.all(db.results.map(async (page) => {
-    const blocks = await notion.blocks.children.list({ block_id: page.id });
+    const blocks = await client.blocks.children.list({ block_id: page.id });
 
     const content = blocks.results.map(b => {
       const type = b.type;
@@ -32,7 +26,6 @@ async function fetchPosts() {
         if (t.annotations.code) s = '<code>' + s + '</code>';
         return s;
       }).join('');
-
       if (type === 'paragraph') return '<p>' + getText(b.paragraph.rich_text) + '</p>';
       if (type === 'heading_1') return '<h1>' + getText(b.heading_1.rich_text) + '</h1>';
       if (type === 'heading_2') return '<h2>' + getText(b.heading_2.rich_text) + '</h2>';
@@ -65,7 +58,7 @@ async function fetchPosts() {
 
   fs.mkdirSync('posts', { recursive: true });
   fs.writeFileSync('posts/index.json', JSON.stringify(posts, null, 2));
-  console.log('Done! Saved ' + posts.length + ' posts to posts/index.json');
+  console.log('Done! Saved ' + posts.length + ' posts.');
 }
 
 fetchPosts().catch(err => {
