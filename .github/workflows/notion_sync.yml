@@ -31,6 +31,11 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: node sync.js
 
+      - name: Ensure posts file exists
+        run: |
+          mkdir -p posts
+          [ -f posts/index.json ] || echo "[]" > posts/index.json
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
