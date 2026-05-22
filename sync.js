@@ -1,7 +1,12 @@
 const notionPkg = require('./node_modules/@notionhq/client');
-console.log('Notion package keys:', Object.keys(notionPkg));
 const Client = notionPkg.Client;
 const fs = require('fs');
+
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
+console.log('Client type:', typeof notion);
+console.log('Client keys:', Object.keys(notion));
+console.log('databases:', typeof notion.databases);
+console.log('databases.query:', typeof notion.databases?.query);
 
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
