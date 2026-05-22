@@ -1,26 +1,10 @@
 [
   {
-    "id": "368b3939-70d5-808d-831c-cfe8262c9318",
-    "title": "this is me trying to make a new page to sync with git hub",
-    "date": "",
-    "tags": [],
-    "cover": "",
-    "content": ""
-  },
-  {
     "id": "368b3939-70d5-80e6-a49a-dc463635ae1c",
-    "title": "Untitled",
+    "title": "NLP and new google updates",
     "date": "",
     "tags": [],
     "cover": "",
-    "content": ""
-  },
-  {
-    "id": "368b3939-70d5-809c-9c94-fec197c701aa",
-    "title": "My first time trying out the git repo for actions",
-    "date": "2026-05-22",
-    "tags": [],
-    "cover": "",
-    "content": "<p></p>"
+    "content": "<p>In recent updates, Google has focused heavily on deeply integrating advanced artificial intelligence across its entire product ecosystem. The core search engine has shifted toward AI-generated summaries that synthesize complex web results directly at the top of the page, while the Gemini assistant has been deeply woven into Android, Workspace apps like Docs and Gmail, and the Chrome browser to streamline multitasking. Additionally, Google has implemented significant privacy and security overhauls, including advanced real-time fraud detection systems to protect users from malicious apps, and refined its mobile hardware lineup to better handle localized, on-device AI processing</p>"
   }
 ]
