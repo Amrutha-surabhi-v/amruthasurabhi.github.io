@@ -1,31 +1,63 @@
-const pkg = require('./node_modules/@notionhq/client');
-const Client = pkg.Client;
 const fs = require('fs');
+const https = require('https');
 
-const client = new Client({ auth: process.env.NOTION_TOKEN });
+const TOKEN = process.env.NOTION_TOKEN;
+const DB_ID = process.env.NOTION_DATABASE_ID;
 
-console.log('Connecting to Notion...');
+function notionRequest(path, body) {
+  return new Promise((resolve, reject) => {
+    const data = body ? JSON.stringify(body) : null;
+    const options = {
+      hostname: 'api.notion.com',
+      path: '/v1/' + path,
+      method: body ? 'POST' : 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + TOKEN,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json',
+        ...(data ? { 'Content-Length': Buffer.byteLength(data) } : {})
+      }
+    };
+    const req = https.request(options, res => {
+      let raw = '';
+      res.on('data', chunk => raw += chunk);
+      res.on('end', () => {
+        try { resolve(JSON.parse(raw)); }
+        catch(e) { reject(new Error('Bad JSON: ' + raw)); }
+      });
+    });
+    req.on('error', reject);
+    if (data) req.write(data);
+    req.end();
+  });
+}
 
 async function fetchPosts() {
-  const db = await client.databases.query({
-    database_id: process.env.NOTION_DATABASE_ID,
+  console.log('Querying Notion database...');
+
+  const db = await notionRequest('databases/' + DB_ID + '/query', {
     sorts: [{ timestamp: 'created_time', direction: 'descending' }]
   });
+
+  if (db.object === 'error') {
+    throw new Error('Notion API error: ' + db.message);
+  }
 
   console.log('Found ' + db.results.length + ' rows');
 
   const posts = await Promise.all(db.results.map(async (page) => {
-    const blocks = await client.blocks.children.list({ block_id: page.id });
+    const blocks = await notionRequest('blocks/' + page.id + '/children');
 
-    const content = blocks.results.map(b => {
+    const getText = (arr) => (arr || []).map(t => {
+      let s = t.plain_text;
+      if (t.annotations.bold) s = '<strong>' + s + '</strong>';
+      if (t.annotations.italic) s = '<em>' + s + '</em>';
+      if (t.annotations.code) s = '<code>' + s + '</code>';
+      return s;
+    }).join('');
+
+    const content = (blocks.results || []).map(b => {
       const type = b.type;
-      const getText = (arr) => (arr || []).map(t => {
-        let s = t.plain_text;
-        if (t.annotations.bold) s = '<strong>' + s + '</strong>';
-        if (t.annotations.italic) s = '<em>' + s + '</em>';
-        if (t.annotations.code) s = '<code>' + s + '</code>';
-        return s;
-      }).join('');
       if (type === 'paragraph') return '<p>' + getText(b.paragraph.rich_text) + '</p>';
       if (type === 'heading_1') return '<h1>' + getText(b.heading_1.rich_text) + '</h1>';
       if (type === 'heading_2') return '<h2>' + getText(b.heading_2.rich_text) + '</h2>';
@@ -58,7 +90,7 @@ async function fetchPosts() {
 
   fs.mkdirSync('posts', { recursive: true });
   fs.writeFileSync('posts/index.json', JSON.stringify(posts, null, 2));
-  console.log('Done! Saved ' + posts.length + ' posts.');
+  console.log('Done! Saved ' + posts.length + ' posts to posts/index.json');
 }
 
 fetchPosts().catch(err => {
