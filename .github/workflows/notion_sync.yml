@@ -39,14 +39,6 @@ jobs:
           async function fetchPosts() {
             const db = await notion.databases.query({
               database_id: process.env.NOTION_DATABASE_ID,
-              filter: {
-                or: [
-                  { property: 'status', status: { equals: 'Published' } },
-                  { property: 'Status', status: { equals: 'Published' } },
-                  { property: 'status', select: { equals: 'Published' } },
-                  { property: 'Status', select: { equals: 'Published' } },
-                ]
-              },
               sorts: [{ property: 'date', direction: 'descending' }]
             });
 
