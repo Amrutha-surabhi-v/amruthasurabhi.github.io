@@ -40,8 +40,12 @@ jobs:
             const db = await notion.databases.query({
               database_id: process.env.NOTION_DATABASE_ID,
               filter: {
-                property: 'status',
-                status: { equals: 'Published' }
+                or: [
+                  { property: 'status', status: { equals: 'Published' } },
+                  { property: 'Status', status: { equals: 'Published' } },
+                  { property: 'status', select: { equals: 'Published' } },
+                  { property: 'Status', select: { equals: 'Published' } },
+                ]
               },
               sorts: [{ property: 'date', direction: 'descending' }]
             });
@@ -97,6 +101,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p posts
           git add posts/
-          git diff --staged --quiet || git commit -m "chore: sync notion posts $(date -u '+%Y-%m-%d %H:%M')"
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+          git commit -m "chore: sync notion posts $(date -u '+%Y-%m-%d %H:%M')"
           git push
