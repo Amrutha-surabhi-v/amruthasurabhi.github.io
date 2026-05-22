@@ -22,12 +22,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Notion SDK
-        run: |
-          npm init -y
-          npm install @notionhq/client
-          node -e "const {Client}=require('@notionhq/client');console.log('SDK OK');"
-
       - name: Run sync
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
