@@ -83,6 +83,7 @@ jobs:
 
             fs.mkdirSync('posts', { recursive: true });
             fs.writeFileSync('posts/index.json', JSON.stringify(posts, null, 2));
+            console.log('Written to posts/index.json');
             console.log('Synced ' + posts.length + ' posts.');
           }
 
@@ -93,8 +94,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdir -p posts
-          git add posts/
+          ls -la posts/ || echo "posts folder missing"
+          git status
+          git add -f posts/index.json
           git diff --staged --quiet && echo "No changes to commit" && exit 0
           git commit -m "chore: sync notion posts $(date -u '+%Y-%m-%d %H:%M')"
           git push
