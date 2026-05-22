@@ -2,8 +2,8 @@ name: Sync Notion Blog Posts
 
 on:
   schedule:
-    - cron: '0 */6 * * *'   # runs every 6 hours automatically
-  workflow_dispatch:          # lets you trigger it manually too
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,12 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install Notion SDK
         run: npm install @notionhq/client
@@ -38,20 +40,18 @@ jobs:
             const db = await notion.databases.query({
               database_id: process.env.NOTION_DATABASE_ID,
               filter: {
-                property: 'Status',
-                select: { equals: 'Published' }
+                property: 'status',
+                status: { equals: 'Published' }
               },
-              sorts: [{ property: 'Date', direction: 'descending' }]
+              sorts: [{ property: 'date', direction: 'descending' }]
             });
 
             const posts = await Promise.all(db.results.map(async (page) => {
-              // Get page blocks (content)
               const blocks = await notion.blocks.children.list({ block_id: page.id });
 
-              // Convert blocks to simple HTML
               const content = blocks.results.map(b => {
                 const type = b.type;
-                const getText = (arr) => arr.map(t => {
+                const getText = (arr) => (arr || []).map(t => {
                   let s = t.plain_text;
                   if (t.annotations.bold) s = '<strong>' + s + '</strong>';
                   if (t.annotations.italic) s = '<em>' + s + '</em>';
@@ -77,9 +77,9 @@ jobs:
               const props = page.properties;
               return {
                 id: page.id,
-                title: props.Title?.title?.[0]?.plain_text || 'Untitled',
-                date: props.Date?.date?.start || '',
-                tags: props.Tags?.multi_select?.map(t => t.name) || [],
+                title: props.title?.title?.[0]?.plain_text || props.Title?.title?.[0]?.plain_text || 'Untitled',
+                date: props.date?.date?.start || props.Date?.date?.start || '',
+                tags: props.tags?.multi_select?.map(t => t.name) || props.Tags?.multi_select?.map(t => t.name) || [],
                 cover: page.cover?.external?.url || page.cover?.file?.url || '',
                 content
               };
@@ -90,13 +90,13 @@ jobs:
             console.log('Synced ' + posts.length + ' posts.');
           }
 
-          fetchPosts().catch(console.error);
+          fetchPosts().catch(err => { console.error(err); process.exit(1); });
           "
 
       - name: Commit and push posts
         run: |
-          git config user.name "notion-sync-bot"
-          git config user.email "bot@amrutha.dev"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add posts/
           git diff --staged --quiet || git commit -m "chore: sync notion posts $(date -u '+%Y-%m-%d %H:%M')"
           git push
