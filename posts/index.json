@@ -1,5 +1,13 @@
 [
   {
+    "id": "36cb3939-70d5-80cc-a282-d98c58842fd3",
+    "title": "Quantum Machine learning ",
+    "date": "",
+    "tags": [],
+    "cover": "",
+    "content": "<h2><strong>Quantum Machine Learning Stays Ahead Even With Noisy Qubits</strong></h2><p>A new study by Onur Danaci (Leiden University) and colleagues shows that <strong>quantum computers can outperform classical approaches in machine learning even with realistic, noisy hardware</strong>. The key finding: a clear quantum advantage emerges at just <strong>30–40 noisy qubits</strong>.</p><h2><strong>What the researchers found</strong></h2><h2><strong>Why coherent processing wins</strong></h2><p>Coherent quantum processing <strong>keeps quantum information intact</strong> while manipulating it—leveraging superposition and entanglement to preserve rich relationships in the data . In contrast, fixed-measurement schemes collapse the quantum state early (like taking a single snapshot), losing valuable quantum correlations .</p><h2><strong>What this means for the field</strong></h2><li><strong>Practical advantage now</strong>: This isn't just theoretical—it uses imperfect, realistic quantum data and shows advantage on hardware available today</li><li><strong>New bottleneck</strong>: The limiting factor shifts from raw computational power to <strong>how fast we can acquire data</strong></li><li><strong>NISQ relevance</strong>: The work directly addresses challenges in the Noisy Intermediate-Scale Quantum (NISQ) era</li><li><strong>Applications</strong>: Especially promising for domains where quantum states are fundamental, like <strong>materials science</strong></li><h2><strong>Caveats & next steps</strong></h2><p>The advantage demonstrated is <strong>asymptotic</strong>—it grows with scale for this specific learning problem—but it's not yet proven for all machine learning tasks . Future work will focus on:</p><li>Extending the advantage to <strong>broader ML algorithms</strong></li><li>Improving <strong>qubit coherence</strong> and error correction</li><li>Moving from simulation to <strong>practical utility</strong> on real devices</li>"
+  },
+  {
     "id": "368b3939-70d5-80e6-a49a-dc463635ae1c",
     "title": "NLP and new google updates",
     "date": "",
